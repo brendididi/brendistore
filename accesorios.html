@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accesorios — Brendi Store</title>
+  <style>
+    :root {
+      --color-piel: #ffdfc4;
+      --blanco: #ffffff;
+      --gris-suave: #f4f4f4;
+      --negro: #222;
+      --accent: #c28f6f;
+      --success: #2f9e44;
+    }
+
+    html, body { height: 100%; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Poppins", sans-serif;
+      background: var(--gris-suave);
+      color: var(--negro);
+      transition: background 450ms ease;
+      min-height: 100vh;
+    }
+
+    body.has-bg {
+      background-image: url('fondo.jpeg');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    body.has-bg.zoom-bg { background-size: 120% auto; }
+    body.bg-transparent { background: transparent; }
+
+    .bg-anim { position: fixed; inset: 0; z-index: 0; background-image: url('fondo.jpeg'); background-size: cover; background-position: center; transform: scale(1.12); opacity: 0; pointer-events: none; }
+    .bg-anim.animate { animation: bgIn 800ms cubic-bezier(.2,.9,.2,1) forwards; }
+    @keyframes bgIn { from { transform: scale(1.12); opacity: 0 } 40% { transform: scale(1.03); opacity: .7 } to { transform: scale(1); opacity: 1 } }
+
+    header {
+      background: var(--color-piel);
+      padding: 18px 40px;
+      display: flex;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 3;
+    }
+    nav a { margin: 0 20px; text-decoration: none; color: var(--negro); font-weight: 700; font-size: 1.05rem; transition: .2s; }
+    nav a:hover { color: var(--accent); }
+
+    .cart {
+      position: absolute;
+      right: 18px;
+      top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 40;
+      cursor: pointer;
+    }
+    .cart-btn { background: transparent; border: none; display:flex; align-items:center; gap:8px; font-weight:700; color:var(--negro); cursor:pointer; }
+    .cart-btn img { width:18px; height:18px; display:block; }
+    .cart-badge { background: var(--accent); color: #fff; border-radius: 999px; padding: 4px 8px; font-size: 0.85rem; min-width: 26px; text-align: center; }
+    .cart-panel { position: absolute; right: 12px; top: 56px; width: 340px; max-width: calc(100vw - 32px); background: rgba(255,255,255,0.98); border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12); padding: 12px; display: none; flex-direction: column; gap: 8px; }
+    .cart-panel.show { display: flex; }
+    .cart-item { display:flex; gap:10px; align-items:center; padding:6px 0; border-bottom: 1px dashed rgba(0,0,0,0.04); }
+    .cart-item img { width:48px; height:48px; object-fit:cover; border-radius:8px; }
+    .cart-item .meta { flex:1; font-size:0.95rem; }
+    .cart-item .meta b { display:block; }
+    .cart-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px; }
+    .cart-empty { color:#666; font-size:0.95rem; padding:8px 6px; text-align:center; }
+
+    .hero { background: rgba(255,255,255,0.9); margin: 40px auto 24px; max-width: 960px; padding: 48px; border-radius: 18px; box-shadow: 0 8px 30px rgba(0,0,0,0.09); text-align: center; position: relative; z-index: 2; opacity: 0; transform: translateY(18px) scale(.995); transition: opacity 600ms ease, transform 600ms ease; }
+    .hero.animate { opacity: 1; transform: translateY(0) scale(1); }
+    .hero .eyebrow { display:block; color:#7a5f52; font-weight:600; margin-bottom:8px; letter-spacing:1px; text-transform:uppercase; font-size:0.78rem; }
+    .hero h1 { margin:8px 0 6px; font-size:2.4rem; line-height:1.05; font-weight:800; font-family: "Harlow Solid Italic", "HarlowSolid", "Poppins", cursive, sans-serif; }
+    .hero p.lead { margin:0 0 18px; font-size:1.05rem; color:#5b4b44; max-width:760px; margin-left:auto; margin-right:auto; }
+    .cta-row { display:flex; justify-content:center; gap:12px; margin-top:12px; flex-wrap:wrap; }
+    .btn { background: var(--negro); color: white; padding: 12px 18px; border-radius: 12px; text-decoration: none; font-weight:700; box-shadow: 0 8px 18px rgba(0,0,0,0.12); transition: transform .16s ease, box-shadow .16s ease; }
+    .btn.secondary { background: transparent; color: var(--negro); border: 2px solid rgba(34,34,34,0.08); font-weight:600; }
+    .btn:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,0.14); }
+
+    .splash { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--color-piel); display:flex; justify-content:center; align-items:center; z-index:999; overflow:hidden; flex-direction:column; gap:6px; }
+    .splash-content { text-align:center; }
+    .splash-title { font-family: "Harlow Solid Italic", "HarlowSolid", "Poppins", cursive, sans-serif; font-style: italic; font-size:3.2rem; margin:0; color:var(--negro); letter-spacing:1px; opacity:0; animation: titleIn 700ms ease forwards; }
+    .splash-subtitle { margin:4px 0 0; font-family:"Poppins",sans-serif; font-weight:600; font-size:0.98rem; line-height:1.05; color:#5b4b44; opacity:0; transform:translateY(6px); animation: subtitleIn 600ms ease 500ms forwards; letter-spacing:0.3px; }
+    .splash-images { display:flex; justify-content:center; gap:18px; margin-top:8px; }
+    .splash-images img { width:92px; height:auto; transform:translateY(30px) scale(0.9); opacity:0; animation: floatIn 900ms cubic-bezier(.2,.9,.2,1) forwards; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12)); }
+    .splash.hide { transition: opacity 600ms ease, visibility 600ms ease; opacity:0; visibility:hidden; pointer-events:none; }
+    @keyframes floatIn { from { transform:translateY(30px) scale(.9); opacity:0 } 60% { transform:translateY(-8px) scale(1.02); opacity:1 } to { transform:translateY(0) scale(1); opacity:1 } }
+    @keyframes titleIn { from { opacity:0; transform:translateY(8px) scale(.98) } to { opacity:1; transform:translateY(0) scale(1) } }
+
+    .featured { max-width: 1100px; margin: 18px auto 60px; padding: 18px; z-index: 2; position: relative; }
+    .featured h2 { font-size: 1.4rem; margin: 0 0 12px; color: #3f2f2a; text-align: center; font-weight: 700; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; align-items: start; }
+    .product-card { background: rgba(255,255,255,0.92); border-radius: 14px; padding: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.06); transition: transform 220ms ease, box-shadow 220ms ease; overflow: hidden; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 18px 40px rgba(0,0,0,0.10); }
+    .product-media { width: 100%; height: 160px; border-radius: 10px; overflow: hidden; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.9)); margin-bottom: 12px; }
+    .product-media img { width: auto; height: 100%; transition: transform 300ms cubic-bezier(.2,.9,.2,1), filter 200ms ease; transform-origin: center center; object-fit:contain; }
+    .product-card:hover .product-media img { transform: scale(1.08); filter: saturate(1.05); }
+    .product-title { font-weight:700; color:#3f2f2a; margin: 6px 0 4px; font-size:1rem; text-transform:uppercase; }
+    .product-price { color:#7a5f52; font-weight:700; margin-bottom:10px; }
+
+    .buy-row { display:flex; gap:8px; justify-content:center; align-items:center; width:100%; margin-top:8px; flex-wrap:wrap; }
+    .qty-controls { display:inline-flex; align-items:center; gap:6px; background: #fff; border-radius:8px; border:1px solid rgba(0,0,0,0.06); padding:4px; }
+    .qty-controls button { background: transparent; border: none; padding:6px 8px; cursor:pointer; font-weight:700; color:var(--negro); border-radius:6px; }
+    .qty-input { width:64px; min-width:44px; padding:6px 8px; text-align:center; border-radius:6px; border:1px solid rgba(0,0,0,0.08); font-weight:700; font-size:0.95rem; }
+    .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .btn-buy { background: var(--accent); color: white; padding: 8px 12px; border-radius: 10px; text-decoration: none; font-weight:700; transition: transform 160ms ease, box-shadow 160ms ease; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.6px; display:inline-flex; align-items:center; justify-content:center; }
+    .btn-buy:hover { transform: scale(1.06); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+
+    .add-toast { font-size:0.9rem; padding:6px 10px; border-radius: 999px; background: rgba(47,158,68,0.12); color: var(--success); border: 1px solid rgba(47,158,68,0.18); display:inline-block; transform: scale(0.98); opacity: 0; transition: opacity 220ms ease, transform 220ms ease; pointer-events: none; text-transform: uppercase; letter-spacing: 0.4px; }
+    .add-toast.show { opacity: 1; transform: scale(1); }
+
+    @media (max-width:420px) { .product-media { height: 140px; } .cart-panel { width: 90vw; } }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="splash" class="splash" aria-hidden="false">
+    <div class="splash-content" role="img" aria-label="Brendi Store splash">
+      <h1 class="splash-title">Brendi Store</h1>
+      <p class="splash-subtitle">Beauty &amp; Skincare</p>
+      <div class="splash-images">
+        <img src="inicio/gato.png" alt="Gato">
+        <img src="inicio/ovejita.png" alt="Ovejita">
+        <img src="inicio/pinguino.png" alt="Pinguino">
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <nav>
+      <a href="index.html" aria-label="Inicio">🏠 Inicio</a>
+      <a href="index.html#skincare">Skincare</a>
+      <a href="makeup.html">Makeup</a>
+      <a href="accesorios.html">Accesorios</a>
+      <a href="https://wa.me/595982665123" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp a +595 982 665123">Contacto</a>
+    </nav>
+
+    <div class="cart" id="cartRoot" aria-live="polite">
+      <button class="cart-btn" id="cartToggle" aria-expanded="false" title="Ver carrito">
+        <img src="carrito.png" alt="Carrito">
+        <span class="cart-badge" id="cartCount">0</span>
+      </button>
+
+      <div class="cart-panel" id="cartPanel" role="region" aria-label="Carrito de compras">
+        <div id="cartItemsWrap"></div>
+        <div class="cart-footer">
+          <div><strong>Total:</strong> <span id="cartTotal">$0</span></div>
+          <button id="checkoutBtn" class="btn" style="padding:8px 10px; font-size:0.95rem;">Pagar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="hero" class="hero" aria-labelledby="hero-title">
+    <span class="eyebrow">Accesorios</span>
+    <h1 id="hero-title">ACCESORIOS — BRENDI STORE</h1>
+    <p class="lead">Colección de accesorios. Imágenes desde la carpeta "accesorios".</p>
+
+    <div class="cta-row">
+      <!-- Cambiado href a ancla local para que NO navegue a otra página -->
+      <a id="toCollections" class="btn" href="#collections">Comenzar</a>
+      <a class="btn secondary" href="https://wa.me/595982665123" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp a +595 982 665123">Contáctanos</a>
+    </div>
+  </section>
+
+  <section class="featured" id="collections">
+    <h2>ACCESORIOS DESTACADOS</h2>
+    <div class="products-grid" role="list">
+      <article class="product-card" role="listitem" data-sku="arqueador-pestanas" data-title="ARQUEADOR DE PESTAÑAS" data-price="5" data-img="accesorios/arqueador%20de%20pesta%C3%B1as%20%245.jpeg">
+        <div class="product-media"><img src="accesorios/arqueador%20de%20pesta%C3%B1as%20%245.jpeg" alt="ARQUEADOR DE PESTAÑAS"></div>
+        <div class="product-title">ARQUEADOR DE PESTAÑAS</div>
+        <div class="product-price">$5</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="5">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="cepillo-cabello" data-title="CEPILLO PARA CABELLO" data-price="7" data-img="accesorios/cepilloparacabello.jpeg">
+        <div class="product-media"><img src="accesorios/cepilloparacabello.jpeg" alt="CEPILLO PARA CABELLO"></div>
+        <div class="product-title">CEPILLO PARA CABELLO</div>
+        <div class="product-price">$7</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="7">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="espejito" data-title="ESPEJITO" data-price="6" data-img="accesorios/espejito.jpeg">
+        <div class="product-media"><img src="accesorios/espejito.jpeg" alt="ESPEJITO"></div>
+        <div class="product-title">ESPEJITO</div>
+        <div class="product-price">$6</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="6">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="esponjita-base" data-title="ESPONJITA PARA BASE" data-price="6" data-img="accesorios/esponjitaparabase%20%246.jpeg">
+        <div class="product-media"><img src="accesorios/esponjitaparabase%20%246.jpeg" alt="ESPONJITA PARA BASE"></div>
+        <div class="product-title">ESPONJITA PARA BASE</div>
+        <div class="product-price">$6</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="6">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="masajeador-facial" data-title="MASAJEADOR FACIAL" data-price="9" data-img="accesorios/masajeadorfacial.jpeg">
+        <div class="product-media"><img src="accesorios/masajeadorfacial.jpeg" alt="MASAJEADOR FACIAL"></div>
+        <div class="product-title">MASAJEADOR FACIAL</div>
+        <div class="product-price">$9</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="9">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="neceser" data-title="NECESER" data-price="8" data-img="accesorios/neceser.jpeg">
+        <div class="product-media"><img src="accesorios/neceser.jpeg" alt="NECESER"></div>
+        <div class="product-title">NECESER</div>
+        <div class="product-price">$8</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="8">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="pinza-cabello" data-title="PINZA PARA CABELLO" data-price="3" data-img="accesorios/pinzaparacabello.jpeg">
+        <div class="product-media"><img src="accesorios/pinzaparacabello.jpeg" alt="PINZA PARA CABELLO"></div>
+        <div class="product-title">PINZA PARA CABELLO</div>
+        <div class="product-price">$3</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="3">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+
+      <article class="product-card" role="listitem" data-sku="scrunchie" data-title="SCRUNCHIE PARA PELO" data-price="5" data-img="accesorios/scrunchieparapelo.jpeg">
+        <div class="product-media"><img src="accesorios/scrunchieparapelo.jpeg" alt="SCRUNCHIE PARA PELO"></div>
+        <div class="product-title">SCRUNCHIE PARA PELO</div>
+        <div class="product-price">$5</div>
+        <div class="buy-row">
+          <div class="qty-controls" aria-label="Selector de cantidad">
+            <button class="qty-minus" aria-label="Disminuir">−</button>
+            <input class="qty-input" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Cantidad">
+            <button class="qty-plus" aria-label="Aumentar">+</button>
+          </div>
+          <button class="btn-buy" data-price="5">Comprar</button>
+          <span class="add-toast" aria-hidden="true">Agregado</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const splash = document.getElementById('splash');
+      const hero = document.getElementById('hero');
+      const totalVisible = 800;
+      let proceeded = false;
+      function proceedToBackground() {
+        if (proceeded) return;
+        proceeded = true;
+        document.body.classList.add('bg-transparent');
+        const bgDiv = document.createElement('div');
+        bgDiv.className = 'bg-anim';
+        bgDiv.style.backgroundImage = "url('fondo.jpeg')";
+        document.body.appendChild(bgDiv);
+        bgDiv.offsetHeight;
+        bgDiv.classList.add('animate');
+        const onBgAnimEnd = () => {
+          document.body.classList.add('has-bg', 'zoom-bg');
+          document.body.classList.remove('bg-transparent');
+          bgDiv.removeEventListener('animationend', onBgAnimEnd);
+          if (bgDiv.parentNode) bgDiv.parentNode.removeChild(bgDiv);
+          setTimeout(() => { if (hero) hero.classList.add('animate'); }, 120);
+        };
+        bgDiv.addEventListener('animationend', onBgAnimEnd);
+        setTimeout(() => {
+          if (document.body.classList.contains('bg-transparent')) {
+            document.body.classList.add('has-bg', 'zoom-bg');
+            document.body.classList.remove('bg-transparent');
+            if (bgDiv.parentNode) bgDiv.parentNode.removeChild(bgDiv);
+            if (hero) hero.classList.add('animate');
+          }
+        }, 1400);
+        if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+      }
+      setTimeout(() => {
+        if (!splash) return;
+        splash.classList.add('hide');
+        const onTransitionEnd = (e) => {
+          if (e.target === splash && e.propertyName === 'opacity') {
+            proceedToBackground();
+            splash.removeEventListener('transitionend', onTransitionEnd);
+          }
+        };
+        splash.addEventListener('transitionend', onTransitionEnd);
+        setTimeout(proceedToBackground, 500);
+      }, totalVisible);
+
+      // Carrito funcional (igual que index)
+      const cart = {};
+      const cartCountEl = document.getElementById('cartCount');
+      const cartPanel = document.getElementById('cartPanel');
+      const cartItemsWrap = document.getElementById('cartItemsWrap');
+      const cartTotalEl = document.getElementById('cartTotal');
+      const cartToggle = document.getElementById('cartToggle');
+
+      function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+      function updateCartUI(){
+        const totalQty = Object.values(cart).reduce((s,it)=>s+it.qty,0);
+        cartCountEl.textContent = totalQty;
+        cartItemsWrap.innerHTML = '';
+        if (totalQty === 0) {
+          cartItemsWrap.innerHTML = '<div class="cart-empty">Tu carrito está vacío</div>';
+          cartTotalEl.textContent = '$0';
+          return;
+        }
+        let total = 0;
+        Object.values(cart).forEach(item => {
+          total += item.price * item.qty;
+          const node = document.createElement('div');
+          node.className = 'cart-item';
+          node.innerHTML = `
+            <img src="${item.img}" alt="${escapeHtml(item.title)}">
+            <div class="meta">
+              <b>${escapeHtml(item.title)}</b>
+              <div>${item.qty} × $${item.price}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;">$${(item.price*item.qty).toFixed(2)}</div>
+              <button data-sku="${item.sku}" class="remove-item" style="background:transparent;border:none;color:#c24f4f;cursor:pointer;margin-top:6px;">×</button>
+            </div>
+          `;
+          cartItemsWrap.appendChild(node);
+        });
+        cartTotalEl.textContent = '$' + total.toFixed(2);
+        cartItemsWrap.querySelectorAll('.remove-item').forEach(btn=>{
+          btn.addEventListener('click', ev=>{
+            const sku = ev.currentTarget.getAttribute('data-sku');
+            delete cart[sku];
+            updateCartUI();
+          });
+        });
+      }
+
+      cartToggle.addEventListener('click', (e)=> {
+        e.stopPropagation();
+        const open = cartPanel.classList.toggle('show');
+        cartToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', (e)=>{
+        if (!document.getElementById('cartRoot').contains(e.target)) {
+          cartPanel.classList.remove('show');
+          cartToggle.setAttribute('aria-expanded','false');
+        }
+      });
+
+      document.querySelectorAll('.product-card').forEach(card => {
+        const minus = card.querySelector('.qty-minus');
+        const plus = card.querySelector('.qty-plus');
+        const input = card.querySelector('.qty-input');
+        const btn = card.querySelector('.btn-buy');
+        const MAX = 999;
+
+        function getSafeVal() {
+          let v = parseInt(input.value, 10);
+          if (Number.isNaN(v)) v = 1;
+          v = Math.max(1, Math.min(MAX, v));
+          input.value = v;
+          return v;
+        }
+
+        plus.addEventListener('click', ()=> { const v = getSafeVal() + 1; input.value = Math.min(MAX, v); });
+        minus.addEventListener('click', ()=> { const v = getSafeVal() - 1; input.value = Math.max(1, v); });
+
+        input.addEventListener('input', ()=> { const raw = input.value.replace(/[^\d]/g, ''); input.value = raw; });
+        input.addEventListener('blur', ()=> { getSafeVal(); });
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+
+        btn.addEventListener('click', ()=> {
+          const sku = card.getAttribute('data-sku');
+          const title = card.getAttribute('data-title');
+          const price = Number(card.getAttribute('data-price'));
+          const img = card.getAttribute('data-img');
+          const qty = getSafeVal();
+
+          if (!cart[sku]) cart[sku] = { sku, title, price, qty, img };
+          else cart[sku].qty += qty;
+          updateCartUI();
+
+          const toast = card.querySelector('.add-toast');
+          toast.classList.add('show');
+          toast.setAttribute('aria-hidden','false');
+          setTimeout(()=> { toast.classList.remove('show'); toast.setAttribute('aria-hidden','true'); }, 1200);
+
+          cartPanel.classList.add('show');
+          cartToggle.setAttribute('aria-expanded','true');
+          setTimeout(()=> { cartPanel.classList.remove('show'); cartToggle.setAttribute('aria-expanded','false'); }, 2500);
+        });
+      });
+
+      document.getElementById('checkoutBtn').addEventListener('click', ()=> {
+        const total = Object.values(cart).reduce((s,it)=> s + it.price*it.qty, 0);
+        if (total === 0) { alert('El carrito está vacío.'); return; }
+        alert('Checkout demo — total: $' + total.toFixed(2));
+      });
+
+      updateCartUI();
+
+      // Manejo del botón "Comenzar" para que baje la misma página (sin navegar al inicio)
+      const toCollections = document.getElementById('toCollections');
+      function scrollToCollectionsWithOffset() {
+        const target = document.getElementById('collections');
+        if (!target) return;
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const extraOffset = 12; // separacion extra
+        const top = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - extraOffset;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+
+      if (toCollections) {
+        toCollections.addEventListener('click', function (e) {
+          // Evitar salto inmediato; hacemos scroll suave dentro de la misma página
+          e.preventDefault();
+          scrollToCollectionsWithOffset();
+        });
+
+        // Permitir también acción con teclado (Enter/Space) al tener foco
+        toCollections.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            scrollToCollectionsWithOffset();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
